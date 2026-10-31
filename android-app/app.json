@@ -1,0 +1,33 @@
+{
+  "expo": {
+    "name": "Saldo · Controle financeiro",
+    "slug": "saldo-financeiro",
+    "scheme": "saldo",
+    "version": "1.0.1",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "package": "br.com.saldo.financeiro",
+      "versionCode": 2,
+      "adaptiveIcon": {
+        "backgroundColor": "#101b2d",
+        "foregroundImage": "./assets/android-icon-foreground.png"
+      }
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-status-bar",
+      "expo-sharing"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "name": "saldo-controle-financeiro",
+  "version": "1.0.0",
+  "main": "expo-router/entry",
+  "dependencies": {
+    "@react-native-async-storage/async-storage": "2.2.0",
+    "expo": "~58.0.22",
+    "expo-constants": "~58.0.14",
+    "expo-file-system": "~58.0.13",
+    "expo-linking": "~58.0.15",
+    "expo-print": "~58.0.8",
+    "expo-router": "~58.0.29",
+    "expo-sharing": "~58.0.21",
+    "expo-status-bar": "~58.0.4",
+    "react": "19.3.0",
+    "react-native": "0.88.1",
+    "react-native-safe-area-context": "~5.10.1",
+    "react-native-screens": "~4.30.1"
+  },
+  "scripts": {
+    "start": "expo start",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
+    "web": "expo start --web",
+    "apk": "powershell -NoProfile -ExecutionPolicy Bypass -File .\\build-apk.ps1"
+  },
+  "private": true
+}
