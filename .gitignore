@@ -1,0 +1,10 @@
+android-app/node_modules/
+android-app/.expo/
+android-app/android/
+android-app/build/
+android-app/Saldo.apk
+*.apk
+*.keystore
+*.jks
+.env
+.env.*

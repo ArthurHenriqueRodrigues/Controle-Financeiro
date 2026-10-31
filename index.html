@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="pt-BR" class="storage-loading">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101b2d">
+  <meta name="description" content="Controle financeiro pessoal com dashboard, relatórios e estimativa informativa de ICMS em São Paulo.">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Saldo">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
+  <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+  <title>Saldo — Controle financeiro</title>
+  <link rel="stylesheet" href="styles.css?v=3">
+  <script src="app.js?v=5" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="#" aria-label="Saldo, início">
+        <span class="brand-mark" aria-hidden="true">s</span>
+        <span>saldo<span class="brand-period">.</span></span>
+      </a>
+      <div class="workspace-label">ESPAÇO PESSOAL</div>
+      <nav class="main-nav" aria-label="Navegação principal">
+        <button class="nav-link active" data-page="dashboard"><span class="nav-icon">◫</span> Visão geral</button>
+        <button class="nav-link" data-page="transactions"><span class="nav-icon">⇄</span> Lançamentos</button>
+        <button class="nav-link" data-page="reports"><span class="nav-icon">▤</span> Relatórios</button>
+        <button class="nav-link" data-page="taxes"><span class="nav-icon">％</span> Impostos</button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="location-card">
+          <span class="location-icon">⌖</span>
+          <span><strong>São Paulo, SP</strong><small>Brasil · BRL</small></span>
+          <span class="online-dot" title="Localização configurada"></span>
+        </div>
+        <div class="sidebar-note">Seus dados ficam salvos neste dispositivo.</div>
+        <button class="install-app-button preferences-button" id="openPreferencesSidebar" type="button"><span class="install-app-icon">⚙</span><span>Perfil e preferências</span><span class="install-chevron">›</span></button>
+        <button class="install-app-button" id="installApp"><span class="install-app-icon">↓</span><span id="installButtonText">Instalar aplicativo</span><span class="install-chevron">›</span></button>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <button class="menu-toggle" id="menuToggle" aria-label="Abrir menu">☰</button>
+        <div class="breadcrumb"><span>Finanças</span><span class="crumb-slash">/</span><strong id="pageTitle">Visão geral</strong></div>
+        <div class="topbar-actions">
+          <label class="month-picker"><span class="sr-only">Mês de referência</span><span class="calendar-icon">▦</span><input id="monthPicker" type="month"></label>
+          <button class="button button-primary top-add" id="addTransaction"><span>＋</span> Novo lançamento</button>
+          <button class="avatar" id="openPreferences" aria-label="Abrir perfil e preferências">M</button>
+        </div>
+      </header>
+
+      <div class="page-container">
+        <section class="page-section active" id="dashboardPage">
+          <div class="page-heading">
+            <div><p class="eyebrow" id="welcomeDate">SUAS FINANÇAS, EM UM SÓ LUGAR</p><h1>Bom dia, <span id="userNameHeading">Marina</span> <span class="wave">✦</span></h1><p class="muted">Aqui está o resumo do seu dinheiro neste mês.</p></div>
+            <button class="button button-quiet" id="dashboardReport">Ver relatório <span>↗</span></button>
+          </div>
+
+          <div class="summary-grid">
+            <article class="summary-card balance-card">
+              <div class="card-topline"><span>Saldo do mês</span><span class="card-icon balance-icon">↗</span></div>
+              <div class="summary-value" id="balanceValue">R$ 0,00</div>
+              <div class="summary-foot"><span class="status-pill" id="balanceStatus">—</span><span>receitas menos despesas</span></div>
+              <div class="balance-decoration" aria-hidden="true"></div>
+            </article>
+            <article class="summary-card">
+              <div class="card-topline"><span>Receitas</span><span class="card-icon income-icon">↓</span></div>
+              <div class="summary-value" id="incomeValue">R$ 0,00</div>
+              <div class="summary-foot"><span class="comparison positive" id="incomeCount">0 entradas</span><span>neste mês</span></div>
+            </article>
+            <article class="summary-card">
+              <div class="card-topline"><span>Despesas</span><span class="card-icon expense-icon">↑</span></div>
+              <div class="summary-value" id="expenseValue">R$ 0,00</div>
+              <div class="summary-foot"><span class="comparison neutral" id="expenseCount">0 saídas</span><span>neste mês</span></div>
+            </article>
+            <article class="summary-card tax-summary-card">
+              <div class="card-topline"><span>ICMS simulado</span><span class="card-icon tax-icon">％</span></div>
+              <div class="summary-value" id="taxValue">R$ 0,00</div>
+              <div class="summary-foot"><span class="comparison tax-caption">referência paulista</span><button class="inline-link" data-go="taxes">Como calculamos?</button></div>
+            </article>
+          </div>
+
+          <div class="dashboard-grid">
+            <article class="panel flow-panel">
+              <div class="panel-heading"><div><h2>Fluxo financeiro</h2><p>Entradas e saídas ao longo do período</p></div><span class="chart-legend"><i class="legend-income"></i> Receitas <i class="legend-expense"></i> Despesas</span></div>
+              <div class="chart-wrap"><canvas id="flowChart" aria-label="Gráfico de receitas e despesas nos últimos seis meses"></canvas></div>
+              <div class="chart-footer"><span>Últimos 6 meses</span><span class="chart-total" id="chartTotal"></span></div>
+            </article>
+            <article class="panel budget-panel" id="budgetPanel">
+              <div class="panel-heading"><div><h2>Orçamento mensal</h2><p>Despesas comparadas ao limite</p></div><button class="icon-button" id="editBudget" aria-label="Editar orçamento">···</button></div>
+              <div class="budget-total"><strong id="budgetSpent">R$ 0,00</strong><span>de <span id="budgetLimit">R$ 0,00</span></span></div>
+              <div class="progress-track"><div class="progress-fill" id="budgetProgress"></div></div>
+              <div class="budget-status"><span id="budgetPercent">0% utilizado</span><span id="budgetRemaining">—</span></div>
+              <div class="budget-divider"></div>
+              <div class="panel-subheading"><strong>Por categoria</strong><button class="inline-link" data-go="transactions">Ver detalhes</button></div>
+              <div class="category-bars" id="categoryBars"></div>
+            </article>
+          </div>
+
+          <article class="panel recent-panel">
+            <div class="panel-heading"><div><h2>Últimos lançamentos</h2><p>Movimentações recentes da sua conta</p></div><button class="button button-small button-outline" data-go="transactions">Ver todos <span>→</span></button></div>
+            <div class="table-wrap">
+              <table class="data-table"><thead><tr><th>DESCRIÇÃO</th><th>CATEGORIA</th><th>DATA</th><th>VALOR</th></tr></thead><tbody id="recentRows"></tbody></table>
+            </div>
+          </article>
+        </section>
+
+        <section class="page-section" id="transactionsPage">
+          <div class="page-heading">
+            <div><p class="eyebrow">MOVIMENTAÇÕES</p><h1>Seus lançamentos</h1><p class="muted">Acompanhe e organize cada entrada e saída.</p></div>
+            <button class="button button-primary" id="addTransactionSecondary"><span>＋</span> Novo lançamento</button>
+          </div>
+          <article class="panel transactions-panel">
+            <div class="filter-row">
+              <label class="search-field"><span>⌕</span><input id="searchTransactions" type="search" placeholder="Buscar lançamento"></label>
+              <select id="typeFilter" aria-label="Filtrar por tipo"><option value="all">Todos os tipos</option><option value="income">Receitas</option><option value="expense">Despesas</option></select>
+              <select id="categoryFilter" aria-label="Filtrar por categoria"><option value="all">Todas as categorias</option></select>
+            </div>
+            <div class="table-wrap">
+              <table class="data-table transactions-table"><thead><tr><th>DESCRIÇÃO</th><th>CATEGORIA</th><th>DATA</th><th>TIPO</th><th>VALOR</th><th><span class="sr-only">Ações</span></th></tr></thead><tbody id="transactionRows"></tbody></table>
+              <div class="empty-state hidden" id="emptyTransactions"><span>⌕</span><strong>Nenhum lançamento encontrado</strong><p>Tente mudar os filtros ou adicione um novo lançamento.</p></div>
+            </div>
+          </article>
+        </section>
+
+        <section class="page-section" id="reportsPage">
+          <div class="page-heading">
+            <div><p class="eyebrow">ANÁLISE E EXPORTAÇÃO</p><h1>Relatório financeiro</h1><p class="muted">Feche o período com um resumo claro das suas finanças.</p></div>
+            <button class="button button-primary" id="printReport"><span>↧</span> Exportar / imprimir</button>
+          </div>
+          <article class="panel report-filter-panel">
+            <div class="report-filter-copy"><span class="report-icon">▤</span><div><strong>Período do relatório</strong><small>Escolha as datas para atualizar os indicadores.</small></div></div>
+            <div class="report-controls">
+              <label class="report-mode-label">Exibir<select id="reportMode"><option value="month">Mês</option><option value="year">Ano</option><option value="custom">Período personalizado</option></select></label>
+              <label class="report-period-field" id="reportMonthField">Mês<input type="month" id="reportMonth"></label>
+              <label class="report-period-field hidden" id="reportYearField">Ano<input type="number" id="reportYear" min="2000" max="2100" step="1"></label>
+              <div class="date-range hidden" id="reportCustomFields"><label>De <input type="date" id="reportStart"></label><label>Até <input type="date" id="reportEnd"></label></div>
+              <button class="button button-dark" id="applyReport">Atualizar</button>
+            </div>
+          </article>
+          <div class="report-metrics" id="reportMetrics"></div>
+          <article class="panel report-table-panel hidden" id="annualSummaryPanel"><div class="panel-heading"><div><h2>Resumo por mês</h2><p>Comparativo de receitas e despesas do ano</p></div></div><div class="table-wrap"><table class="data-table"><thead><tr><th>MÊS</th><th>RECEITAS</th><th>DESPESAS</th><th>SALDO</th></tr></thead><tbody id="annualSummaryRows"></tbody></table></div></article>
+          <div class="dashboard-grid report-grid">
+            <article class="panel report-category-panel"><div class="panel-heading"><div><h2>Despesas por categoria</h2><p>Distribuição no período selecionado</p></div></div><div class="category-bars report-bars" id="reportCategoryBars"></div></article>
+            <article class="panel report-tax-panel"><div class="panel-heading"><div><h2>Resumo da simulação de ICMS</h2><p>Percentuais configurados sobre despesas</p></div></div><div id="reportTaxSummary"></div></article>
+          </div>
+          <article class="panel report-table-panel"><div class="panel-heading report-detail-heading"><div><h2>Detalhamento do período</h2><p id="reportPeriodLabel"></p></div><div class="report-actions"><button class="button button-small button-outline" id="exportCsv">Baixar CSV</button><button class="button button-small button-danger-outline" id="clearReportTransactions">Apagar lançamentos do período</button></div></div><div class="table-wrap"><table class="data-table"><thead><tr><th>DESCRIÇÃO</th><th>CATEGORIA</th><th>DATA</th><th>TIPO</th><th>VALOR</th></tr></thead><tbody id="reportRows"></tbody></table></div></article>
+          <p class="report-disclaimer">Relatório pessoal para organização financeira. A estimativa tributária não substitui comprovantes fiscais, orientação contábil ou apuração oficial.</p>
+        </section>
+
+        <section class="page-section" id="taxesPage">
+          <div class="page-heading">
+            <div><p class="eyebrow">ICMS · SÃO PAULO</p><h1>Impostos no consumo</h1><p class="muted">Simulação informativa com a alíquota interna de referência do ICMS paulista.</p></div>
+            <span class="location-tag"><span>⌖</span> São Paulo, Brasil</span>
+          </div>
+          <div class="tax-notice"><span class="notice-symbol">i</span><div><strong>Simulação, não cálculo fiscal</strong><p>A referência inicial é 18% de ICMS, alíquota interna geral em São Paulo. A incidência e a alíquota efetivas variam conforme o produto, serviço e regras específicas; por isso, o resultado não representa o imposto real das suas compras. Ajuste cada categoria quando tiver dados mais precisos.</p></div></div>
+          <div class="tax-overview-grid">
+            <article class="panel tax-total-panel"><span class="tax-panel-label">ICMS simulado neste mês</span><strong id="taxPageTotal">R$ 0,00</strong><span class="tax-ratio" id="taxRatio">— das despesas</span><div class="tax-total-bottom"><span>Base da simulação no período</span><strong id="taxPageBase">R$ 0,00</strong></div></article>
+            <article class="panel tax-method-panel"><div class="panel-heading"><div><h2>Como estimamos</h2><p>Simulação por categoria de despesa</p></div></div><div class="method-equation"><span>Despesa</span><b>×</b><span>alíquota informada</span><b>=</b><span>ICMS simulado</span></div><p>O cálculo aplica o percentual configurado sobre o valor lançado. É apenas uma referência simplificada: muitas despesas não têm incidência de ICMS e alguns produtos seguem regras ou alíquotas diferentes.</p></article>
+          </div>
+          <article class="panel rates-panel">
+            <div class="panel-heading"><div><h2>Alíquota de referência por categoria</h2><p>O padrão é 18%; ajuste ou zere categorias sem incidência de ICMS.</p></div><button class="button button-small button-outline" id="resetRates">Restaurar 18%</button></div>
+            <div class="rate-list" id="rateList"></div>
+          </article>
+          <article class="panel legal-panel">
+            <div class="panel-heading"><div><h2>Referências legais e limites da fonte</h2><p>Textos para consulta; confirme sempre a publicação oficial vigente.</p></div><span class="source-badge">REPOSITÓRIO INDICADO</span></div>
+            <div class="legal-grid">
+              <a class="legal-reference" href="https://github.com/ctresb/leis/blob/main/federal/leis-complementares/1996/lcp-87-1996-09-13.md" target="_blank" rel="noreferrer"><span class="legal-type">FEDERAL · LC 87/1996</span><strong>ICMS — regras gerais</strong><small>Lei Complementar nº 87/1996 · textos federais no acervo</small><span class="legal-arrow">↗</span></a>
+              <a class="legal-reference" href="https://github.com/ctresb/leis/blob/main/federal/leis-complementares/2003/lcp-116-2003-07-31.md" target="_blank" rel="noreferrer"><span class="legal-type">FEDERAL · LC 116/2003</span><strong>ISS — serviços</strong><small>Lei Complementar nº 116/2003 · incidência sobre serviços</small><span class="legal-arrow">↗</span></a>
+              <a class="legal-reference" href="https://github.com/ctresb/leis/tree/main/federal/leis-ordinarias" target="_blank" rel="noreferrer"><span class="legal-type">FEDERAL · LEIS 10.637/2002 E 10.833/2003</span><strong>PIS/Pasep e Cofins</strong><small>Contribuições com regras e regimes distintos</small><span class="legal-arrow">↗</span></a>
+              <a class="legal-reference" href="https://www.al.sp.gov.br/norma/25030" target="_blank" rel="noreferrer"><span class="legal-type">ESTADUAL · LEI SP 6.374/1989</span><strong>ICMS em São Paulo</strong><small>Texto da lei na Assembleia Legislativa do Estado de São Paulo</small><span class="legal-arrow">↗</span></a>
+              <a class="legal-reference" href="https://github.com/ctresb/leis/tree/main/federal/leis-complementares/2025" target="_blank" rel="noreferrer"><span class="legal-type">FEDERAL · LC 214/2025</span><strong>IBS, CBS e Imposto Seletivo</strong><small>Reforma do consumo e regras de transição</small><span class="legal-arrow">↗</span></a>
+            </div>
+            <p class="source-footnote">Em 2026, a transição prevista na LC 214/2025 não é calculada individualmente aqui: o painel não apura IBS/CBS/IS, créditos ou compensações.</p>
+            <p class="source-footnote">Fonte: <a href="https://github.com/ctresb/leis" target="_blank" rel="noreferrer">ctresb/leis</a>. O próprio repositório informa que o conteúdo é informativo, pode conter conversões/OCR e não substitui a publicação oficial.</p>
+          </article>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <div class="modal-backdrop hidden" id="transactionModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <form class="modal-card" id="transactionForm">
+      <div class="modal-header"><div><p class="eyebrow">MOVIMENTAÇÃO FINANCEIRA</p><h2 id="modalTitle">Novo lançamento</h2></div><button type="button" class="modal-close" data-close-modal aria-label="Fechar">×</button></div>
+      <input type="hidden" id="transactionId">
+      <label class="form-label">Descrição<input id="descriptionInput" type="text" maxlength="80" placeholder="Ex.: Conta de energia" required></label>
+      <div class="form-grid"><label class="form-label">Tipo<select id="transactionType"><option value="expense">Despesa</option><option value="income">Receita</option></select></label><label class="form-label">Categoria<select id="transactionCategory" required></select></label></div>
+      <div class="form-grid"><label class="form-label">Valor (R$)<input id="amountInput" type="number" min="0.01" step="0.01" placeholder="0,00" required></label><label class="form-label">Data<input id="dateInput" type="date" required></label></div>
+      <label class="form-label">Forma de pagamento <select id="paymentInput"><option>Pix</option><option>Cartão de crédito</option><option>Cartão de débito</option><option>Dinheiro</option><option>Transferência</option><option>Boleto</option><option>Outro</option></select></label>
+      <div class="modal-actions"><button type="button" class="button button-outline" data-close-modal>Cancelar</button><button type="submit" class="button button-primary">Salvar lançamento</button></div>
+    </form>
+  </div>
+  <div class="modal-backdrop hidden" id="budgetModal" role="dialog" aria-modal="true" aria-labelledby="budgetModalTitle">
+    <form class="modal-card compact-modal" id="budgetForm">
+      <div class="modal-header"><div><p class="eyebrow">PLANEJAMENTO</p><h2 id="budgetModalTitle">Orçamento do mês</h2></div><button type="button" class="modal-close" data-close-modal aria-label="Fechar">×</button></div>
+      <label class="form-label">Limite mensal de despesas (R$)<input id="budgetInput" type="number" min="0" step="0.01" required></label>
+      <p class="form-hint">O indicador compara as despesas lançadas no mês com este limite.</p>
+      <div class="modal-actions"><button type="button" class="button button-outline" data-close-modal>Cancelar</button><button type="submit" class="button button-primary">Salvar limite</button></div>
+    </form>
+  </div>
+  <div class="modal-backdrop hidden" id="preferencesModal" role="dialog" aria-modal="true" aria-labelledby="preferencesTitle">
+    <div class="modal-card compact-modal">
+      <div class="modal-header"><div><p class="eyebrow">PERSONALIZAÇÃO</p><h2 id="preferencesTitle">Perfil e preferências</h2></div><button type="button" class="modal-close" data-close-modal aria-label="Fechar">×</button></div>
+      <form id="preferencesForm">
+        <label class="form-label">Como quer ser chamado?<input id="userNameInput" type="text" maxlength="40" autocomplete="given-name" placeholder="Seu nome" required></label>
+        <label class="theme-choice"><input id="darkModeInput" type="checkbox"><span>Usar modo escuro</span></label>
+        <div class="modal-actions"><button type="button" class="button button-outline" data-close-modal>Cancelar</button><button type="submit" class="button button-primary">Salvar preferências</button></div>
+      </form>
+      <div class="backup-section">
+        <strong>Armazenamento local e backup JSON</strong>
+        <p>Os dados são salvos automaticamente no banco local do aplicativo, separado dos cookies. Exporte uma cópia JSON para guardar fora do navegador ou restaure um arquivo salvo anteriormente.</p>
+        <div class="backup-actions"><button type="button" class="button button-small button-outline" id="exportBackup">Baixar backup</button><button type="button" class="button button-small button-outline" id="chooseBackup">Restaurar backup</button><input class="sr-only" type="file" id="importBackup" accept=".json,application/json"></div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-backdrop hidden" id="installModal" role="dialog" aria-modal="true" aria-labelledby="installModalTitle">
+    <div class="modal-card compact-modal install-modal">
+      <div class="modal-header"><div><p class="eyebrow">SALDO NO SEU CELULAR</p><h2 id="installModalTitle">Instale o Saldo</h2></div><button type="button" class="modal-close" data-close-modal aria-label="Fechar">×</button></div>
+      <p class="install-intro">Adicione o app à tela inicial para abrir em tela cheia e consultar seus dados mesmo sem internet.</p>
+      <div class="install-instructions" id="installInstructions"></div>
+      <div class="modal-actions"><button type="button" class="button button-primary" data-close-modal>Entendi</button></div>
+    </div>
+  </div>
+  <div class="assistant-widget">
+    <section class="assistant-panel hidden" id="assistantPanel" role="dialog" aria-label="Assistente do Saldo">
+      <header class="assistant-header">
+        <div class="assistant-mark" aria-hidden="true">s</div>
+        <div><strong>Assistente Saldo</strong><small>Respostas e organização, direto no aparelho</small></div>
+        <button class="assistant-close" id="assistantClose" type="button" aria-label="Fechar assistente">×</button>
+      </header>
+      <div class="assistant-messages" id="assistantMessages" role="log" aria-live="polite" aria-relevant="additions">
+        <div class="assistant-message assistant-message-bot"><p>Oi! Posso resumir suas finanças do mês, responder sobre categorias ou organizar a tabela. Seus dados não saem deste aparelho.</p></div>
+        <div class="assistant-suggestions" id="assistantSuggestions">
+          <button type="button" data-assistant-prompt="Quanto gastei neste mês?">Gastos do mês</button>
+          <button type="button" data-assistant-prompt="Mostre despesas">Ver despesas</button>
+          <button type="button" data-assistant-prompt="Organize por maior valor">Maior valor primeiro</button>
+          <button type="button" data-assistant-prompt="comandos">Todos os comandos</button>
+        </div>
+      </div>
+      <form class="assistant-form" id="assistantForm">
+        <label class="sr-only" for="assistantInput">Pergunte ou peça para organizar seus lançamentos</label>
+        <input id="assistantInput" type="text" maxlength="180" placeholder="Escreva uma pergunta..." autocomplete="off" required>
+        <button type="submit" aria-label="Enviar mensagem">↑</button>
+      </form>
+    </section>
+    <button class="assistant-toggle" id="assistantToggle" type="button" aria-expanded="false" aria-controls="assistantPanel">
+      <span aria-hidden="true">✦</span> Assistente
+    </button>
+  </div>
+  <nav class="mobile-nav" aria-label="Navegação do aplicativo">
+    <button class="mobile-nav-link active" data-page="dashboard"><span>◫</span>Início</button>
+    <button class="mobile-nav-link" data-page="transactions"><span>⇄</span>Lançamentos</button>
+    <button class="mobile-nav-link" data-page="reports"><span>▤</span>Relatórios</button>
+    <button class="mobile-nav-link" data-page="taxes"><span>％</span>Impostos</button>
+  </nav>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
